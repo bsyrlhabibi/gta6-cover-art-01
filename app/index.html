@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Azul Cover Lab — Bahía Azul cover maker</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="topbar">
+  <div>
+    <h1>AZUL COVER LAB</h1>
+    <p class="sub">Turn any photo into Bahía Azul cover art. Photos stay on your machine.</p>
+  </div>
+  <div class="exports">
+    <button type="button" data-export="square">Export 1080 × 1080 PNG</button>
+    <button type="button" data-export="portrait">Export 1080 × 1350 PNG</button>
+    <button type="button" data-export="wide" class="primary">Export 1920 × 1080 PNG</button>
+  </div>
+</header>
+<main class="layout">
+  <aside class="controls">
+    <section>
+      <h2><span class="step">1</span> Add photos</h2>
+      <label class="filebtn">Choose photos<input id="fileInput" type="file" accept="image/*" multiple></label>
+      <p class="hint">Or drag &amp; drop them onto the cover. Click a thumbnail to pick it as a brush, then click a panel to paint it in.</p>
+      <div id="thumbs" class="thumbs"></div>
+    </section>
+    <section>
+      <h2><span class="step">2</span> Arrange the panels</h2>
+      <div class="row">
+        <button type="button" data-layout="poster">Poster hero</button>
+        <button type="button" data-layout="slices">Slices</button>
+        <button type="button" data-layout="triptych">Triptych</button>
+        <button type="button" data-layout="duo">Duo</button>
+      </div>
+      <div class="row">
+        <button type="button" data-aspect="square">Square</button>
+        <button type="button" data-aspect="portrait">Portrait</button>
+        <button type="button" data-aspect="wide">Wide</button>
+      </div>
+      <p id="panelLabel" class="hint">Panel 1</p>
+      <label>Panel photo <select id="panelPhoto"></select></label>
+      <label>Zoom <input id="zoom" type="range" min="1" max="3" step="0.01" value="1"></label>
+      <label>Move X <input id="offx" type="range" min="-0.6" max="0.6" step="0.01" value="0"></label>
+      <label>Move Y <input id="offy" type="range" min="-0.6" max="0.6" step="0.01" value="0"></label>
+      <p class="hint">Click a panel to select it. Drag inside it to reposition its photo; scroll to zoom.</p>
+    </section>
+    <section>
+      <h2><span class="step">3</span> Letter it &amp; export</h2>
+      <label>Caption <input id="caption" type="text" maxlength="26" value="AZUL HEAT"></label>
+      <label>Tagline <input id="tagline" type="text" maxlength="30" value="BAHÍA AZUL"></label>
+      <label>Caption style
+        <select id="capStyle">
+          <option value="sunset">Sunset</option>
+          <option value="neon">Neon</option>
+          <option value="classic">Classic</option>
+        </select>
+      </label>
+      <label>Caption position
+        <select id="capPos">
+          <option value="bottom">Bottom</option>
+          <option value="top">Top</option>
+        </select>
+      </label>
+      <label>Caption size <input id="capScale" type="range" min="0.6" max="1.35" step="0.01" value="1"></label>
+      <label>Grade <input id="grade" type="range" min="0" max="1" step="0.01" value="0.8"></label>
+      <label>Warmth <input id="warmth" type="range" min="0" max="1" step="0.01" value="0.6"></label>
+    </section>
+  </aside>
+  <section id="stage" class="stage">
+    <canvas id="preview" width="920" height="518"></canvas>
+    <p class="hint center">Live preview — exports render at full size in one click.</p>
+  </section>
+</main>
+<script type="module" src="src/main.js"></script>
+</body>
+</html>
