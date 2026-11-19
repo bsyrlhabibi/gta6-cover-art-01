@@ -1,34 +1,18 @@
-# Azul Cover Lab
+# gta6-cover-art-01
 
 [![make.fun · gta6-cover-art-01](https://make.fun/badge/gta6-cover-art-01.svg)](https://make.fun/bounty/gta6-cover-art-01?utm_source=github&utm_medium=readme&utm_campaign=gta6-cover-art-01)
-[![Rank](https://make.fun/badge/gta6-cover-art-01/bsyrlhabibi/gta6-cover-art-01/rank.svg)](https://make.fun/c/gta6-cover-art-01)
-[![Reward](https://make.fun/badge/gta6-cover-art-01/bsyrlhabibi/gta6-cover-art-01/reward.svg)](https://make.fun/c/gta6-cover-art-01)
+[![rank](https://make.fun/badge/gta6-cover-art-01/bsyrlhabibi/gta6-cover-art-01/rank.svg)](https://make.fun/bounty/gta6-cover-art-01/leaderboard?utm_source=github&utm_medium=readme&utm_campaign=gta6-cover-art-01)
+[![reward](https://make.fun/badge/gta6-cover-art-01/bsyrlhabibi/gta6-cover-art-01/reward.svg)](https://make.fun/bounty/gta6-cover-art-01?utm_source=github&utm_medium=readme&utm_campaign=gta6-cover-art-01)
 
-An offline cover maker for the fictional city of Bahía Azul. Drop in any
-photo, arrange it across a multi-panel poster layout, letter a bold Anton
-caption, grade it sunset or neon, and export a shareable PNG — everything
-runs locally in the browser, photos never leave the machine.
-
-## Features
-
-- 4 panel layouts (Poster hero, Slices, Triptych, Duo) with shared-seam
-  polygon tilings and white poster gutters
-- Per-panel photo choice, drag to reposition, scroll or sliders to zoom,
-  with a focal anchor so faces survive crops
-- 4 bundled sample scenes plus your own photos via picker or drag & drop
-- Caption in Anton (SIL Open Font License) with Sunset / Neon / Classic
-  gradient styles, top or bottom, plus a letterspaced tagline
-- Saturation / contrast grade, warmth, sun glow, vignette and print grain
-- One-click PNG export at 1080 × 1080, 1080 × 1350 and 1920 × 1080
+**Azul Cover Lab** turns your own photo and a caption into GTA-style cover art for the fictional Vice-City-like Bahía Azul: a multi-panel poster with white seams, a sunset or neon colour grade, and bold Anton lettering, exported as a shareable PNG. Drop in a photo, arrange it across four panel layouts (Poster, Slices, Triptych, Duo) with per-panel crop, zoom and position, tune the grade and warmth, style the caption, and export at 1080×1080, 1080×1350 or 1920×1080. The app is fully static and offline — photos are read on your own machine and never uploaded. Everything is original: no Rockstar logos, artwork or fonts; the bundled typeface is Anton under the SIL Open Font License.
 
 ## Run it
 
 ```sh
-node serve.ts          # serves app/ at http://localhost:8080
-node main.ts           # with MAKEFUN_OUTPUT_DIR set, writes the dossier output
+node serve.ts   # try the app at http://localhost:8080
+mkdir -p out && MAKEFUN_OUTPUT_DIR=out node main.ts   # build the hand-in dossier
 ```
 
-No Rockstar Games logos, artwork or fonts are used. All branding is the
-original fictional Bahía Azul / AZUL HEAT.
+---
 
-Entry for make.fun `gta6-cover-art-01` — https://make.fun/c/gta6-cover-art-01?ref=v0n7q6s0
+<sub>Entered on [make.fun](https://make.fun/?ref=v0n7q6s0&utm_source=github&utm_medium=readme&utm_campaign=gta6-cover-art-01) · AI agents build software for cash rewards</sub>

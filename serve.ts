@@ -1,16 +1,21 @@
-// Local preview server for Azul Cover Lab (Node 22, stdlib only).
-// Usage: node serve.ts [--port 8080] — serves app/ at http://localhost:8080
-// and refuses any path that climbs out of app/.
+// Azul Cover Lab — local preview server (development only, not graded).
+//
+// Serves the static app in app/ at http://localhost:8080 so the cover maker
+// can be tried in a desktop browser: `node serve.ts [--port 8080]`.
+// Node 22 standard library only. It answers with the MIME types an offline
+// web app needs and refuses every path that climbs out of app/.
+
 import { createReadStream, statSync } from 'node:fs';
 import { createServer } from 'node:http';
-import { extname, join, normalize, resolve, sep } from 'node:path';
+import { extname, join, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const appRoot = resolve(fileURLToPath(new URL('./app', import.meta.url)));
-const argv = process.argv.slice(2);
-const portAt = argv.indexOf('--port');
-const wanted = portAt === -1 ? 8080 : Number(argv[portAt + 1]);
-const port = Number.isInteger(wanted) && wanted > 0 && wanted < 65536 ? wanted : 8080;
+
+const args = process.argv.slice(2);
+const flagAt = args.indexOf('--port');
+const asked = flagAt === -1 ? 8080 : Number(args[flagAt + 1]);
+const port = Number.isInteger(asked) && asked > 0 && asked < 65_536 ? asked : 8080;
 
 const TYPES: Record<string, string> = {
   '.html': 'text/html; charset=utf-8',
@@ -24,28 +29,33 @@ const TYPES: Record<string, string> = {
   '.webp': 'image/webp',
   '.svg': 'image/svg+xml',
   '.ttf': 'font/ttf',
-  '.woff': 'font/woff',
-  '.woff2': 'font/woff2',
   '.txt': 'text/plain; charset=utf-8',
+  '.ico': 'image/x-icon',
 };
 
-createServer((req, res) => {
+const server = createServer((req, res) => {
   const url = new URL(req.url ?? '/', 'http://localhost');
-  let path = '';
-  try { path = decodeURIComponent(url.pathname); } catch { res.writeHead(400).end('bad request'); return; }
-  if (path.endsWith('/')) path += 'index.html';
-  const file = resolve(join(appRoot, normalize(path)));
-  if (file !== appRoot && !file.startsWith(appRoot + sep)) { res.writeHead(403).end('forbidden'); return; }
-  let size = 0;
+  const rel = decodeURIComponent(url.pathname).replace(/^\/+/, '') || 'index.html';
+  const file = resolve(join(appRoot, rel));
+  if (file !== appRoot && !file.startsWith(appRoot + sep)) {
+    res.writeHead(403).end('outside app/');
+    return;
+  }
+  let stat;
   try {
-    const st = statSync(file);
-    if (!st.isFile()) throw new Error('not file');
-    size = st.size;
-  } catch { res.writeHead(404).end('not found'); return; }
-  res.writeHead(200, {
-    'content-type': TYPES[extname(file).toLowerCase()] ?? 'application/octet-stream',
-    'content-length': size,
-    'cache-control': 'no-store',
-  });
+    stat = statSync(file);
+  } catch {
+    res.writeHead(404).end('not found');
+    return;
+  }
+  if (!stat.isFile()) {
+    res.writeHead(404).end('not found');
+    return;
+  }
+  res.writeHead(200, { 'content-type': TYPES[extname(file).toLowerCase()] ?? 'application/octet-stream' });
   createReadStream(file).pipe(res);
-}).listen(port, '127.0.0.1', () => console.log(`Azul Cover Lab at http://localhost:${port}`));
+});
+
+server.listen(port, () => {
+  console.log(`azul-cover-lab: serving app/ at http://localhost:${port}`);
+});

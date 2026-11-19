@@ -8,72 +8,106 @@
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<header class="topbar">
-  <div>
-    <h1>AZUL COVER LAB</h1>
-    <p class="sub">Turn any photo into Bahía Azul cover art. Photos stay on your machine.</p>
-  </div>
-  <div class="exports">
-    <button type="button" data-export="square">Export 1080 × 1080 PNG</button>
-    <button type="button" data-export="portrait">Export 1080 × 1350 PNG</button>
-    <button type="button" data-export="wide" class="primary">Export 1920 × 1080 PNG</button>
-  </div>
-</header>
-<main class="layout">
-  <aside class="controls">
-    <section>
-      <h2><span class="step">1</span> Add photos</h2>
-      <label class="filebtn">Choose photos<input id="fileInput" type="file" accept="image/*" multiple></label>
-      <p class="hint">Or drag &amp; drop them onto the cover. Click a thumbnail to pick it as a brush, then click a panel to paint it in.</p>
-      <div id="thumbs" class="thumbs"></div>
+<div id="shotWrap" hidden><canvas id="shotCanvas"></canvas></div>
+
+<div id="editor">
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark">AZUL COVER LAB</span>
+      <span class="brand-sub">Bahía Azul · GTA-style cover maker · fully offline</span>
+    </div>
+    <ol class="steps">
+      <li><b>1</b> Add a photo</li>
+      <li><b>2</b> Arrange the panels</li>
+      <li><b>3</b> Export the PNG</li>
+    </ol>
+  </header>
+
+  <main class="layout">
+    <section class="stage-wrap">
+      <canvas id="stage" width="1120" height="630"></canvas>
+      <p class="hint">Click a panel to select it · drag inside a panel to reposition its photo · scroll to zoom it</p>
     </section>
-    <section>
-      <h2><span class="step">2</span> Arrange the panels</h2>
-      <div class="row">
-        <button type="button" data-layout="poster">Poster hero</button>
-        <button type="button" data-layout="slices">Slices</button>
-        <button type="button" data-layout="triptych">Triptych</button>
-        <button type="button" data-layout="duo">Duo</button>
-      </div>
-      <div class="row">
-        <button type="button" data-aspect="square">Square</button>
-        <button type="button" data-aspect="portrait">Portrait</button>
-        <button type="button" data-aspect="wide">Wide</button>
-      </div>
-      <p id="panelLabel" class="hint">Panel 1</p>
-      <label>Panel photo <select id="panelPhoto"></select></label>
-      <label>Zoom <input id="zoom" type="range" min="1" max="3" step="0.01" value="1"></label>
-      <label>Move X <input id="offx" type="range" min="-0.6" max="0.6" step="0.01" value="0"></label>
-      <label>Move Y <input id="offy" type="range" min="-0.6" max="0.6" step="0.01" value="0"></label>
-      <p class="hint">Click a panel to select it. Drag inside it to reposition its photo; scroll to zoom.</p>
-    </section>
-    <section>
-      <h2><span class="step">3</span> Letter it &amp; export</h2>
-      <label>Caption <input id="caption" type="text" maxlength="26" value="AZUL HEAT"></label>
-      <label>Tagline <input id="tagline" type="text" maxlength="30" value="BAHÍA AZUL"></label>
-      <label>Caption style
-        <select id="capStyle">
-          <option value="sunset">Sunset</option>
-          <option value="neon">Neon</option>
-          <option value="classic">Classic</option>
-        </select>
-      </label>
-      <label>Caption position
-        <select id="capPos">
-          <option value="bottom">Bottom</option>
-          <option value="top">Top</option>
-        </select>
-      </label>
-      <label>Caption size <input id="capScale" type="range" min="0.6" max="1.35" step="0.01" value="1"></label>
-      <label>Grade <input id="grade" type="range" min="0" max="1" step="0.01" value="0.8"></label>
-      <label>Warmth <input id="warmth" type="range" min="0" max="1" step="0.01" value="0.6"></label>
-    </section>
-  </aside>
-  <section id="stage" class="stage">
-    <canvas id="preview" width="920" height="518"></canvas>
-    <p class="hint center">Live preview — exports render at full size in one click.</p>
-  </section>
-</main>
+
+    <aside class="controls">
+      <fieldset>
+        <legend>Photos</legend>
+        <label class="add-btn">+ Add your photos
+          <input id="fileInput" type="file" accept="image/*" multiple hidden>
+        </label>
+        <div id="tray" class="tray"></div>
+        <p class="note">Click a thumbnail, then a panel, to fill it. Photos are read on this machine only — never uploaded.</p>
+      </fieldset>
+
+      <fieldset>
+        <legend>Panels</legend>
+        <div class="row">
+          <label>Layout
+            <select id="layoutSel">
+              <option value="poster">Poster — hero + stack</option>
+              <option value="slices">Slices — diagonal bands</option>
+              <option value="triptych">Triptych — three columns</option>
+              <option value="duo">Duo — two big panels</option>
+            </select>
+          </label>
+          <label>Canvas
+            <select id="sizeSel">
+              <option value="wide">Wide 1920 × 1080</option>
+              <option value="square">Square 1080 × 1080</option>
+              <option value="portrait">Portrait 1080 × 1350</option>
+            </select>
+          </label>
+        </div>
+        <div id="panelRows"></div>
+        <div class="sliders">
+          <label>Zoom <input id="zoomR" type="range" min="100" max="300" value="100"></label>
+          <label>Shift X <input id="xR" type="range" min="-40" max="40" value="0"></label>
+          <label>Shift Y <input id="yR" type="range" min="-40" max="40" value="0"></label>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Caption</legend>
+        <label>Headline <input id="capText" type="text" value="AZUL HEAT" maxlength="24"></label>
+        <label>Tagline <input id="tagText" type="text" value="BAHÍA AZUL" maxlength="30"></label>
+        <div class="row">
+          <label>Style
+            <select id="capStyle">
+              <option value="sunset">Sunset</option>
+              <option value="neon">Neon</option>
+              <option value="classic">Classic</option>
+            </select>
+          </label>
+          <label>Position
+            <select id="capPos">
+              <option value="bottom">Bottom</option>
+              <option value="top">Top</option>
+            </select>
+          </label>
+        </div>
+        <label>Lettering size <input id="capScale" type="range" min="60" max="150" value="100"></label>
+      </fieldset>
+
+      <fieldset>
+        <legend>Grade</legend>
+        <label>Saturation <input id="satR" type="range" min="0" max="100" value="35"></label>
+        <label>Contrast <input id="conR" type="range" min="0" max="60" value="12"></label>
+        <label>Sunset warmth <input id="warmR" type="range" min="0" max="100" value="30"></label>
+      </fieldset>
+
+      <fieldset>
+        <legend>Export PNG</legend>
+        <div class="export-row">
+          <button id="expSquare" type="button">1080 × 1080</button>
+          <button id="expPortrait" type="button">1080 × 1350</button>
+          <button id="expWide" type="button">1920 × 1080</button>
+        </div>
+      </fieldset>
+      <p class="foot">Original fan-made tool for the fictional city of Bahía Azul. Typeface: Anton (SIL Open Font License, see app/fonts/OFL.txt).</p>
+    </aside>
+  </main>
+</div>
+
 <script type="module" src="src/main.js"></script>
 </body>
 </html>

@@ -1,40 +1,53 @@
-// Photo handling: bundled sample scenes plus the visitor's own files,
-// read locally with FileReader / object URLs and never uploaded anywhere.
+// photos.js — where cover photos come from.
+//
+// Two sources, both fully offline: the four bundled Bahía Azul sample scenes
+// under app/samples/, and the visitor's own files, read with FileReader as
+// data URLs on their own machine. Nothing is ever uploaded anywhere; a photo
+// exists only as an Image element in this page's memory.
+
 export const SAMPLES = [
-  { src: 'samples/boulevard.jpg', name: 'Boulevard' },
-  { src: 'samples/car.jpg', name: 'Convertible at sunset' },
-  { src: 'samples/neon.jpg', name: 'Neon night street' },
-  { src: 'samples/pier.jpg', name: 'Pier' },
+  { file: 'samples/car.jpg', name: 'Convertible at sunset' },
+  { file: 'samples/boulevard.jpg', name: 'Sunset boulevard' },
+  { file: 'samples/neon.jpg', name: 'Neon night street' },
+  { file: 'samples/pier.jpg', name: 'Pier at dusk' },
 ];
-export function loadImage(src) {
+
+let nextId = 1;
+
+export function loadImage(url) {
   return new Promise((resolve, reject) => {
     const img = new Image();
     img.onload = () => resolve(img);
-    img.onerror = () => reject(new Error('image failed: ' + src));
-    img.src = src;
+    img.onerror = () => reject(new Error(`could not load ${url}`));
+    img.src = url;
   });
 }
-export async function loadSamples(state) {
-  for (let i = 0; i < SAMPLES.length; i++) {
-    const img = await loadImage(SAMPLES[i].src);
-    state.photos.push({ id: i, img, name: SAMPLES[i].name });
+
+export async function loadSamples() {
+  const photos = [];
+  for (const s of SAMPLES) {
+    const img = await loadImage(s.file);
+    photos.push({ id: nextId++, name: s.name, url: s.file, img });
   }
-  state.panels.forEach((p, i) => { p.photoId = i % state.photos.length; });
-  return state.photos;
+  return photos;
 }
-export async function addPhotoFiles(state, files, onDone) {
+
+export function readFileAsDataURL(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result));
+    reader.onerror = () => reject(reader.error);
+    reader.readAsDataURL(file);
+  });
+}
+
+export async function filesToPhotos(files) {
+  const photos = [];
   for (const file of files) {
     if (!file.type.startsWith('image/')) continue;
-    const url = URL.createObjectURL(file);
-    try {
-      const img = await loadImage(url);
-      state.photos.push({ id: state.photos.length, img, name: file.name.slice(0, 24) });
-    } catch { /* skip unreadable files */ }
+    const url = await readFileAsDataURL(file);
+    const img = await loadImage(url);
+    photos.push({ id: nextId++, name: file.name.replace(/\.[^.]+$/, ''), url, img });
   }
-  if (onDone) onDone();
-}
-export function photoForPanel(state, panel) {
-  if (!state.photos.length) return null;
-  const found = state.photos.find((p) => p.id === panel.photoId);
-  return found || state.photos[0];
+  return photos;
 }
